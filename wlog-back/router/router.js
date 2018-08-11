@@ -2,7 +2,8 @@
 const routes = [
   require('./routes/users'),
   require('./routes/login'),
-  require('./routes/exercises')
+  require('./routes/exercises'),
+  require('./routes/workouts')
 ]
 /* eslint-enable global-require */
 

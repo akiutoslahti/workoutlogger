@@ -10,10 +10,7 @@ const workout = (sequelize, DataTypes) => {
       user_id: {
         type: DataTypes.UUID,
         required: true,
-        allowNull: false,
-        validate: {
-          isUUID: 4
-        }
+        allowNull: false
       },
       date: {
         type: DataTypes.DATE,
