@@ -8,7 +8,7 @@ const usersRouter = (app, db) => {
   app.get(baseUrl, async (request, response) => {
     try {
       const allUsers = await db.users.findAll()
-      return response.json(allUsers)
+      return response.status(200).json(allUsers)
     } catch (error) {
       return response
         .status(400)
@@ -24,14 +24,16 @@ const usersRouter = (app, db) => {
           error: `GET ${baseUrl}/${id} failed because id is not valid`
         })
       }
+
       const userById = await db.users.find({
-        where: { id: id }
+        where: { id }
       })
       if (!userById) {
         return response.status(404).json({
           error: `GET ${baseUrl}/${id} failed because user does not exist`
         })
       }
+
       return response.status(200).json(userById)
     } catch (error) {
       return response
@@ -43,6 +45,7 @@ const usersRouter = (app, db) => {
   app.post(baseUrl, async (request, response) => {
     try {
       const { name, role, username, password } = request.body
+
       if (!name || !username) {
         return response.status(400).json({
           error: `POST ${baseUrl} failed because empty name and/or username is not allowed`
@@ -62,7 +65,7 @@ const usersRouter = (app, db) => {
       }
 
       const userAllreadyExists = await db.users.find({
-        where: { username: username }
+        where: { username }
       })
       if (userAllreadyExists) {
         return response.status(409).json({
@@ -96,39 +99,20 @@ const usersRouter = (app, db) => {
           error: `DELETE ${baseUrl}/${id} failed because id is not valid`
         })
       }
-      const userExists = await db.users.find({ where: { id: id } })
+
+      const userExists = await db.users.find({ where: { id } })
       if (!userExists) {
         return response.status(404).json({
           error: `DELETE ${baseUrl}/${id} failed because user does not exist`
         })
       }
-      db.users.destroy({ where: { id: id } })
+
+      db.users.destroy({ where: { id } })
       return response.status(200).send()
     } catch (error) {
       return response
         .status(500)
         .json({ error: `DELETE ${baseUrl}/${id} failed due error` })
-    }
-  })
-
-  app.put(`${baseUrl}/:id`, async (request, response) => {
-    const { id } = request.params
-    try {
-      if (!validator.isUUID(id, 4)) {
-        return response.status(400).json({
-          error: `PUT ${baseUrl}/${id} failed because id is not valid`
-        })
-      }
-      const userExists = await db.users.find({ where: { id: id } })
-      if (!userExists) {
-        return response.status(404).json({
-          error: `PUT ${baseUrl}/${id} failed because user does not exist`
-        })
-      }
-    } catch (error) {
-      return response
-        .status(500)
-        .json({ error: `PUT ${baseUrl}/${id} failed due error` })
     }
   })
 
@@ -140,23 +124,27 @@ const usersRouter = (app, db) => {
           error: `PATCH ${baseUrl}/${id} failed because id is not valid`
         })
       }
-      const userExists = await db.users.find({ where: { id: id } })
+
+      const userExists = await db.users.find({ where: { id } })
       if (!userExists) {
         return response.status(404).json({
           error: `PATCH ${baseUrl}/${id} failed because user does not exist`
         })
       }
+
       const { updates } = request.body
       if (updates.passwordHash) {
         return response.status(400).json({
           error: `PATCH ${baseUrl}/${id} failed because passwordHash cannot be changed directly`
         })
       }
+
       if (updates.password) {
         const passwordHash = await bcrypt.hash(updates.password, saltrounds)
         delete updates.password
         updates.passwordHash = passwordHash
       }
+
       const updatedUser = await userExists.updateAttributes(updates)
       return response.status(200).json(updatedUser)
     } catch (error) {

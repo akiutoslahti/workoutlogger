@@ -8,7 +8,7 @@ const loginRouter = (app, db) => {
   app.post(baseUrl, async (request, response) => {
     const { username, password } = request.body
 
-    const user = await db.users.find({ where: { username: username } })
+    const user = await db.users.find({ where: { username } })
     const passwordCorrect =
       user === null ? false : await bcrypt.compare(password, user.passwordHash)
 

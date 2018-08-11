@@ -1,4 +1,10 @@
-const routes = [require('./routes/users'), require('./routes/login')]
+/* eslint-disable global-require */
+const routes = [
+  require('./routes/users'),
+  require('./routes/login'),
+  require('./routes/exercises')
+]
+/* eslint-enable global-require */
 
 // Add access to the app and db objects to each route
 const router = function router(app, db) {

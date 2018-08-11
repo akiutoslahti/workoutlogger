@@ -1,8 +1,8 @@
 const bodyParser = require('body-parser')
-const db = require('./config/db')
-const env = require('./config/env')
 const express = require('express')
 const morgan = require('morgan')
+const db = require('./config/db')
+const env = require('./config/env')
 const router = require('./router/router')
 
 const app = express()
