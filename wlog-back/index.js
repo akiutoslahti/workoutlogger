@@ -1,20 +1,26 @@
+const bodyParser = require('body-parser')
+const db = require('./config/db')
+const env = require('./config/env')
 const express = require('express')
 const morgan = require('morgan')
-const bodyParser = require('body-parser')
-const env = require('./config/env')
+const router = require('./router/router')
 
 const app = express()
 app.use(morgan('dev'))
 app.use(bodyParser.json())
 
-app.get('*', (request, response) => {
-  response.send('Hello world!')
+router(app, db)
+
+app.get('/', (request, response) => {
+  response.send('wlog backend')
 })
 
 const port = env.PORT
 const host = env.HOST
 
-app.listen(port, () => {
-  console.log(`Server listening on port: ${port}`)
-  console.log(`Access server at: http://${host}:${port}`)
+db.sequelize.sync({ force: true }).then(() => {
+  app.listen(port, () => {
+    console.log(`Server listening on port: ${port}`)
+    console.log(`Access server at: http://${host}:${port}`)
+  })
 })
