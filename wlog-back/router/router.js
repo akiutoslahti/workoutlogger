@@ -1,4 +1,4 @@
-const routes = [require('./routes/users')]
+const routes = [require('./routes/users'), require('./routes/login')]
 
 // Add access to the app and db objects to each route
 const router = function router(app, db) {
