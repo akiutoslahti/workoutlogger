@@ -9,19 +9,33 @@ const user = (sequelize, DataTypes) => {
       },
       name: {
         type: DataTypes.STRING,
-        required: true
+        required: true,
+        allowNull: false,
+        validate: {
+          notEmpty: true
+        }
       },
       role: {
         type: DataTypes.ENUM,
-        values: ['user', 'admin', 'disabled']
+        values: ['user', 'admin', 'disabled'],
+        required: true,
+        allowNull: false
       },
       username: {
         type: DataTypes.STRING,
-        required: true
+        required: true,
+        allowNull: false,
+        validate: {
+          notEmpty: true
+        }
       },
       passwordHash: {
         type: DataTypes.STRING,
-        required: true
+        required: true,
+        allowNull: false,
+        validate: {
+          notEmpty: true
+        }
       }
     },
     {

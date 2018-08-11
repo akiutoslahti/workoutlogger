@@ -1,6 +1,5 @@
 const Sequelize = require('sequelize')
 const env = require('./env')
-console.log(env)
 const sequelize = new Sequelize(env.DB_NAME, env.DB_USER, env.DB_PW, {
   host: env.DB_HOST,
   port: env.DB_PORT,
@@ -17,13 +16,21 @@ db.sequelize = sequelize
 
 // Models / Tables
 db.users = require('../models/users')(sequelize, Sequelize)
-//db.workouts = require('../models/workouts')
-//db.exercises = require('../models/exercises')
+db.workouts = require('../models/workouts')(sequelize, Sequelize)
+db.workoutExercises = require('../models/workout_exercises')(
+  sequelize,
+  Sequelize
+)
+db.exercises = require('../models/exercises')(sequelize, Sequelize)
 
 // Relations
-//db.users.hasMany(db.workouts)
-//db.workouts.belongsTo(db.users)
-//db.workouts.hasMany(db.exercises)
-//db.exercises.belongsTo(db.workouts)
+db.users.hasMany(db.workouts)
+db.workouts.belongsTo(db.users)
+
+db.workouts.hasMany(db.workoutExercises)
+db.workoutExercises.belongsTo(db.workouts)
+
+db.exercises.hasMany(db.workoutExercises)
+db.workoutExercises.belongsTo(db.exercises)
 
 module.exports = db
