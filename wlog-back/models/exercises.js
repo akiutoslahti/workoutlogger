@@ -20,7 +20,7 @@ const exercise = (sequalize, DataTypes) => {
       }
     },
     {
-      paranoid: true,
+      paranoid: false,
       underscored: true
     }
   )

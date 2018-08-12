@@ -1,6 +1,6 @@
 const workoutExercise = (sequelize, DataTypes) => {
   const WorkoutExercise = sequelize.define(
-    'workoutexercise',
+    'workouts_exercises',
     {
       id: {
         type: DataTypes.UUID,
@@ -43,8 +43,9 @@ const workoutExercise = (sequelize, DataTypes) => {
       }
     },
     {
-      paranoid: true,
-      underscored: true
+      paranoid: false,
+      underscored: true,
+      freezeTableName: true
     }
   )
   return WorkoutExercise

@@ -39,7 +39,7 @@ const user = (sequelize, DataTypes) => {
       }
     },
     {
-      paranoid: true,
+      paranoid: false,
       underscored: true
     }
   )

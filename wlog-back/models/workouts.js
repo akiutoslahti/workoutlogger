@@ -23,7 +23,7 @@ const workout = (sequelize, DataTypes) => {
       }
     },
     {
-      paranoid: true,
+      paranoid: false,
       underscored: true
     }
   )
