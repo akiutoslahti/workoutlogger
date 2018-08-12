@@ -3,6 +3,7 @@
   "parser": "babel-eslint",
   "env": {},
   "rules": {
-    "no-console": 0
+    "no-console": 0,
+    "camelcase": 0
   }
 }

@@ -40,7 +40,7 @@ const workoutsRouter = (app, db) => {
 
   app.post(baseUrl, async (request, response) => {
     try {
-      const { user_id, date } = request.body // eslint-disable-line camelcase
+      const { user_id, date } = request.body
       if (!validator.isUUID(user_id, 4)) {
         return response.status(400).json({
           error: `POST ${baseUrl} failed because user id is invalid`

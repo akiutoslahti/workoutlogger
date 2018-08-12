@@ -18,7 +18,7 @@ db.sequelize = sequelize
 // Models / Tables
 db.users = require('../models/users')(sequelize, Sequelize)
 db.workouts = require('../models/workouts')(sequelize, Sequelize)
-db.workoutExercises = require('../models/workout_exercises')(
+db.workoutsExercises = require('../models/workouts_exercises')(
   sequelize,
   Sequelize
 )
@@ -28,10 +28,10 @@ db.exercises = require('../models/exercises')(sequelize, Sequelize)
 db.users.hasMany(db.workouts)
 db.workouts.belongsTo(db.users)
 
-db.workouts.hasMany(db.workoutExercises)
-db.workoutExercises.belongsTo(db.workouts)
+db.workouts.hasMany(db.workoutsExercises)
+db.workoutsExercises.belongsTo(db.workouts)
 
-db.exercises.hasMany(db.workoutExercises)
-db.workoutExercises.belongsTo(db.exercises)
+db.exercises.hasMany(db.workoutsExercises)
+db.workoutsExercises.belongsTo(db.exercises)
 
 module.exports = db
