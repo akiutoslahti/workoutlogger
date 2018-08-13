@@ -19,15 +19,14 @@ const loginRouter = (app, db) => {
     }
 
     const userForToken = {
+      id: user.id,
       username: user.username,
-      id: user.id
+      role: user.role
     }
 
     const token = jwt.sign(userForToken, env.JWT_SECRET)
 
-    return response
-      .status(200)
-      .json({ token, username: user.username, name: user.name })
+    return response.status(200).json({ token })
   })
 }
 

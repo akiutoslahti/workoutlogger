@@ -1,10 +1,10 @@
 const bodyParser = require('body-parser')
 const express = require('express')
 const morgan = require('morgan')
+const http = require('http')
 const db = require('./config/db')
 const env = require('./config/env')
 const router = require('./router/router')
-const http = require('http')
 
 const app = express()
 if (process.env.NODE_ENV === 'development') {

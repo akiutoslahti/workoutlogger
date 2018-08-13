@@ -11,7 +11,7 @@ const usersRouter = (app, db) => {
       return response.status(200).json(allUsers)
     } catch (error) {
       return response
-        .status(400)
+        .status(500)
         .json({ error: `GET ${baseUrl} failed due error` })
     }
   })
