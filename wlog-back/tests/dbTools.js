@@ -2,12 +2,6 @@ const bcrypt = require('bcrypt')
 const db = require('../config/db')
 const env = require('../config/env')
 
-const initDatabase = async () => {
-  await db.sequelize.sync({ force: true })
-  await initUsers()
-  await initWorkouts()
-}
-
 const initUsers = async () => {
   const saltRounds = 10
 
@@ -50,6 +44,12 @@ const initWorkouts = async () => {
     date: Date.now()
   }
   await db.workouts.create(newWorkout2)
+}
+
+const initDatabase = async () => {
+  await db.sequelize.sync({ force: true })
+  await initUsers()
+  await initWorkouts()
 }
 
 const adminAuth = {}

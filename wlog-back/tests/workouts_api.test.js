@@ -8,22 +8,22 @@ const env = require('../config/env')
 
 const baseUrl = '/api/workouts'
 
-let adminAuth, userAuth, adminId, userId
+let adminAuth
+let userAuth
+let adminId
+let userId
 
-const newWorkoutWithId = (id) => {
-  return {
-    user_id: id,
-    date: new Date()
-  }
-}
+const newWorkoutWithId = (id) => ({
+  user_id: id,
+  date: new Date()
+})
 
 describe('workouts_api', () => {
   beforeAll(async () => {
     await dbTools.initDatabase()
     await dbTools.adminLogin(api)
     await dbTools.userLogin(api)
-    adminAuth = dbTools.adminAuth
-    userAuth = dbTools.userAuth
+    ;({ adminAuth, userAuth } = dbTools)
     const admin = await db.users.find({
       where: { username: env.ADMIN_USERNAME }
     })

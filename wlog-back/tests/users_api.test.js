@@ -1,9 +1,9 @@
 const supertest = require('supertest')
+const bcrypt = require('bcrypt')
 const { server, app } = require('../index')
 const dbTools = require('./dbTools')
 const env = require('../config/env')
 const db = require('../config/db')
-const bcrypt = require('bcrypt')
 
 const saltRounds = 10
 
@@ -25,15 +25,15 @@ const userWithName = (name) => ({
   role: 'user'
 })
 
-let adminAuth, userAuth
+let adminAuth
+let userAuth
 
-describe.skip('users_api', () => {
+describe('users_api', () => {
   beforeAll(async () => {
     await dbTools.initDatabase()
     await dbTools.adminLogin(api)
     await dbTools.userLogin(api)
-    adminAuth = dbTools.adminAuth
-    userAuth = dbTools.userAuth
+    ;({ adminAuth, userAuth } = dbTools)
   })
 
   describe('GET /api/users', () => {
