@@ -1,13 +1,12 @@
 const supertest = require('supertest')
-const { server } = require('../index')
+const { server, app } = require('../index')
 const { initDatabase } = require('./initDatabase')
-const api = supertest(server)
-
-beforeAll(async () => {
-  await initDatabase()
-})
+const api = supertest(app)
 
 describe('users_api', () => {
+  beforeAll(async () => {
+    await initDatabase()
+  })
   describe('GET /api/users', () => {
     // without authentication: not allowed
     test('without authentication', async () => {
@@ -41,8 +40,7 @@ describe('users_api', () => {
     // authenticated as user: allowed only for self
     // autheticated as admin: allowed
   })
-})
-
-afterAll(() => {
-  server.close()
+  afterAll(() => {
+    server.close()
+  })
 })

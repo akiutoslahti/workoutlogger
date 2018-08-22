@@ -1,16 +1,15 @@
 const supertest = require('supertest')
-const { server } = require('../index')
+const { server, app } = require('../index')
 const { initDatabase } = require('./initDatabase')
-const api = supertest(server)
+const api = supertest(app)
 const env = require('../config/env')
 
 const baseUrl = '/api/login'
 
-beforeAll(async () => {
-  await initDatabase()
-})
-
 describe('login_api', () => {
+  beforeAll(async () => {
+    await initDatabase()
+  })
   describe('POST /api/login', () => {
     test('no username and/or password', async () => {
       await api
@@ -87,8 +86,7 @@ describe('login_api', () => {
         .expect(401)
     })
   })
-})
-
-afterAll(() => {
-  server.close()
+  afterAll(() => {
+    server.close()
+  })
 })
