@@ -22,12 +22,14 @@ const server = http.createServer(app)
 const port = env.PORT
 const host = env.HOST
 
-db.sequelize.sync({ force: env.DB_SYNC_FORCE || false }).then(() => {
-  server.listen(port, () => {
-    console.log(`Server listening on port: ${port}`)
-    console.log(`Access server at: http://${host}:${port}`)
+if (process.env.NODE_ENV !== 'test') {
+  db.sequelize.sync({ force: env.DB_SYNC_FORCE || false }).then(() => {
+    server.listen(port, () => {
+      console.log(`Server listening on port: ${port}`)
+      console.log(`Access server at: http://${host}:${port}`)
+    })
   })
-})
+}
 
 server.on('close', () => {
   db.sequelize.close()

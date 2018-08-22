@@ -22,4 +22,14 @@ if (process.env.NODE_ENV === 'test') {
 
 env.JWT_SECRET = process.env.JWT_SECRET
 
+env.ADMIN_NAME = process.env.ADMIN_NAME
+env.ADMIN_USERNAME = process.env.ADMIN_USERNAME
+env.ADMIN_PW = process.env.ADMIN_PW
+env.USER_NAME = process.env.USER_NAME
+env.USER_USERNAME = process.env.USER_USERNAME
+env.USER_PW = process.env.USER_PW
+env.DISABLED_NAME = process.env.DISABLED_NAME
+env.DISABLED_USERNAME = process.env.DISABLED_USERNAME
+env.DISABLED_PW = process.env.DISABLED_PW
+
 module.exports = env

@@ -1,13 +1,18 @@
 const supertest = require('supertest')
 const { server } = require('../index')
-
+const { initDatabase } = require('./initDatabase')
 const api = supertest(server)
+
+beforeAll(async () => {
+  await initDatabase()
+})
 
 describe('users_api', () => {
   describe('GET /api/users', () => {
     // without authentication: not allowed
     test('without authentication', async () => {
-      await api.get('/api/users').expect(401)
+      const response = await api.get('/api/users').expect(200)
+      const response2 = await api.get('/api/users').expect(200)
     })
     // authenticated as user: not allowed
     // autheticated as admin: allowed

@@ -40,6 +40,15 @@ const workoutExercise = (sequelize, DataTypes) => {
           isInt: true,
           min: 1
         }
+      },
+      weight: {
+        type: DataTypes.INTEGER,
+        required: true,
+        allowNull: false,
+        validate: {
+          isInt: true,
+          min: 1
+        }
       }
     },
     {
