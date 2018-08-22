@@ -10,7 +10,7 @@ const workoutsRouter = (app, db) => {
     } catch (error) {
       return response
         .status(500)
-        .json({ error: `GET ${baseUrl} failed due error` })
+        .json({ error: `GET ${baseUrl} failed because of error` })
     }
   })
 
@@ -34,7 +34,7 @@ const workoutsRouter = (app, db) => {
     } catch (error) {
       return response
         .status(500)
-        .json({ error: `GET ${baseUrl}/${id} failed due error` })
+        .json({ error: `GET ${baseUrl}/${id} failed because of error` })
     }
   })
 
@@ -64,7 +64,7 @@ const workoutsRouter = (app, db) => {
       console.log(error)
       return response
         .status(500)
-        .json({ error: `POST ${baseUrl} failed due error` })
+        .json({ error: `POST ${baseUrl} failed because of error` })
     }
   })
 
@@ -89,7 +89,7 @@ const workoutsRouter = (app, db) => {
     } catch (error) {
       return response
         .status(500)
-        .json({ error: `DELETE ${baseUrl}/${id} failed due error` })
+        .json({ error: `DELETE ${baseUrl}/${id} failed because of error` })
     }
   })
 
@@ -116,7 +116,7 @@ const workoutsRouter = (app, db) => {
     } catch (error) {
       return response
         .status(500)
-        .json({ error: `PATCH ${baseUrl}/${id} failed due error` })
+        .json({ error: `PATCH ${baseUrl}/${id} failed because of error` })
     }
   })
 }

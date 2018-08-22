@@ -4,41 +4,69 @@ const validator = require('validator')
 const baseUrl = '/api/users'
 const saltrounds = 10
 
+const formatUser = (user) => {
+  const formattedUser = user.toJSON()
+  delete formattedUser.passwordHash
+  delete formattedUser.created_at
+  delete formattedUser.updated_at
+  return formattedUser
+}
+
 const usersRouter = (app, db) => {
   app.get(baseUrl, async (request, response) => {
     try {
+      const { token } = request
+      if (!token || token.role !== 'admin') {
+        return response.status(401).json({
+          error: `GET ${baseUrl} failed because of insufficient priviledges`
+        })
+      }
       const allUsers = await db.users.findAll()
-      return response.status(200).json(allUsers)
+      const formattedUsers = allUsers.map((user) => formatUser(user))
+      return response.status(200).json(formattedUsers)
     } catch (error) {
       return response
         .status(500)
-        .json({ error: `GET ${baseUrl} failed due error` })
+        .json({ error: `GET ${baseUrl} failed because of error` })
     }
   })
 
   app.get(`${baseUrl}/:id`, async (request, response) => {
     const { id } = request.params
     try {
+      const { token } = request
+      if (!token) {
+        return response.status(401).json({
+          error: `GET ${baseUrl}/${id} failed because of insufficient priviledges`
+        })
+      }
       if (!validator.isUUID(id, 4)) {
         return response.status(400).json({
           error: `GET ${baseUrl}/${id} failed because id is not valid`
         })
       }
 
+      if (!(token.id === id || token.role === 'admin')) {
+        return response.status(401).json({
+          error: `GET ${baseUrl}/${id} failed because of insufficient priviledges`
+        })
+      }
+
       const userById = await db.users.find({
         where: { id }
       })
+
       if (!userById) {
         return response.status(404).json({
           error: `GET ${baseUrl}/${id} failed because user does not exist`
         })
       }
 
-      return response.status(200).json(userById)
+      return response.status(200).json(formatUser(userById))
     } catch (error) {
       return response
         .status(500)
-        .json({ error: `GET ${baseUrl}/${id} failed due error` })
+        .json({ error: `GET ${baseUrl}/${id} failed because of error` })
     }
   })
 
@@ -46,21 +74,29 @@ const usersRouter = (app, db) => {
     try {
       const { name, role, username, password } = request.body
 
-      if (!name || !username) {
+      if (!name || name.length === 0 || !username || username.length === 0) {
         return response.status(400).json({
           error: `POST ${baseUrl} failed because empty name and/or username is not allowed`
         })
       }
 
-      if (password.length === 0) {
+      if (!password || password.length === 0) {
         return response.status(400).json({
           error: `POST ${baseUrl} failed because empty password is not allowed`
         })
       }
 
-      if (!(role === 'admin' || role === 'user' || role === 'disabled')) {
+      if (!(role === 'admin' || role === 'user')) {
         return response.status(400).json({
-          error: `POST ${baseUrl} failed because only roles 'admin', 'user' and 'disabled' are allowed`
+          error: `POST ${baseUrl} failed because only roles 'admin' are 'user' are allowed`
+        })
+      }
+
+      const { token } = request
+
+      if (role === 'admin' && (!token || token.role !== 'admin')) {
+        return response.status(401).json({
+          error: `POST ${baseUrl} failed because of insufficient priviledges`
         })
       }
 
@@ -83,17 +119,23 @@ const usersRouter = (app, db) => {
       }
 
       const createdUser = await db.users.create(newUser)
-      return response.status(201).json(createdUser)
+      return response.status(201).json(formatUser(createdUser))
     } catch (error) {
       return response
         .status(500)
-        .json({ error: `POST ${baseUrl} failed due error` })
+        .json({ error: `POST ${baseUrl} failed because of error` })
     }
   })
 
   app.delete(`${baseUrl}/:id`, async (request, response) => {
     const { id } = request.params
     try {
+      const { token } = request
+      if (!token) {
+        return response.status(401).json({
+          error: `DELETE ${baseUrl}/${id} failed because of insufficient priviledges`
+        })
+      }
       if (!validator.isUUID(id, 4)) {
         return response.status(400).json({
           error: `DELETE ${baseUrl}/${id} failed because id is not valid`
@@ -106,19 +148,30 @@ const usersRouter = (app, db) => {
           error: `DELETE ${baseUrl}/${id} failed because user does not exist`
         })
       }
+      if (token.id !== userExists.id && token.role !== 'admin') {
+        return response.status(401).json({
+          error: `DELETE ${baseUrl}/${id} failed because of insufficient priviledges`
+        })
+      }
 
-      db.users.destroy({ where: { id } })
-      return response.status(200).send()
+      await db.users.destroy({ where: { id } })
+      return response.status(204).send()
     } catch (error) {
       return response
         .status(500)
-        .json({ error: `DELETE ${baseUrl}/${id} failed due error` })
+        .json({ error: `DELETE ${baseUrl}/${id} failed because of error` })
     }
   })
 
   app.patch(`${baseUrl}/:id`, async (request, response) => {
     const { id } = request.params
     try {
+      const { token } = request
+      if (!token) {
+        return response.status(401).json({
+          error: `DELETE ${baseUrl}/${id} failed because of insufficient priviledges`
+        })
+      }
       if (!validator.isUUID(id, 4)) {
         return response.status(400).json({
           error: `PATCH ${baseUrl}/${id} failed because id is not valid`
@@ -150,7 +203,7 @@ const usersRouter = (app, db) => {
     } catch (error) {
       return response
         .status(500)
-        .json({ error: `PATCH ${baseUrl}/${id} failed due error` })
+        .json({ error: `PATCH ${baseUrl}/${id} failed because of error` })
     }
   })
 }

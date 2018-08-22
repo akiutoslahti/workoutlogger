@@ -6,6 +6,7 @@ const sequelize = new Sequelize(env.DB_NAME, env.DB_USER, env.DB_PW, {
   port: env.DB_PORT,
   dialect: env.DB_DIALECT,
   operatorsAliases: false,
+  logging: false,
   define: {
     underscored: true
   }

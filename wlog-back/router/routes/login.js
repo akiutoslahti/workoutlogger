@@ -7,15 +7,26 @@ const baseUrl = '/api/login'
 const loginRouter = (app, db) => {
   app.post(baseUrl, async (request, response) => {
     const { username, password } = request.body
+    if (!username || !password) {
+      return response
+        .status(400)
+        .json({ error: 'username and/or password not provided' })
+    }
 
     const user = await db.users.find({ where: { username } })
-    const passwordCorrect =
-      user === null ? false : await bcrypt.compare(password, user.passwordHash)
+    if (!user) {
+      return response.status(404).json({ error: 'user does not exist' })
+    }
 
-    if (!(user && passwordCorrect)) {
+    if (user.role === 'disabled') {
       return response
         .status(401)
-        .json({ error: 'invalid username and/or password' })
+        .json({ error: 'user account has been disabled' })
+    }
+
+    const passwordCorrect = await bcrypt.compare(password, user.passwordHash)
+    if (!passwordCorrect) {
+      return response.status(401).json({ error: 'invalid password' })
     }
 
     const userForToken = {

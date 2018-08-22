@@ -5,12 +5,14 @@ const http = require('http')
 const db = require('./config/db')
 const env = require('./config/env')
 const router = require('./router/router')
+const { tokenUtil } = require('./middlewares/tokenUtil')
 
 const app = express()
 if (process.env.NODE_ENV === 'development') {
   app.use(morgan('dev'))
 }
 app.use(bodyParser.json())
+app.use(tokenUtil)
 
 router(app, db)
 
