@@ -320,7 +320,7 @@ describe('users_api', () => {
     })
   })
 
-  describe.skip('PATCH /api/users/:id', () => {
+  describe.only('PATCH /api/users/:id', () => {
     // without authentication: not allowed
     // authenticated as user: allowed only for self
     // autheticated as admin: allowed
