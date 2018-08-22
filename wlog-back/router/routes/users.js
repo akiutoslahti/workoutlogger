@@ -185,6 +185,12 @@ const usersRouter = (app, db) => {
         })
       }
 
+      if (token.id !== userExists.id && token.role !== 'admin') {
+        return response.status(401).json({
+          error: `PATCH ${baseUrl}/${id} failed because of insufficient priviledges`
+        })
+      }
+
       const { updates } = request.body
       if (updates.passwordHash) {
         return response.status(400).json({

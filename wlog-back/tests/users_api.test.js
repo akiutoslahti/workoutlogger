@@ -100,17 +100,6 @@ describe('users_api', () => {
       })
     })
     describe('authenticated as admin', () => {
-      test('on self', async () => {
-        const admin = await db.users.find({
-          where: { username: env.ADMIN_USERNAME }
-        })
-        const response = await api
-          .get(`${baseUrl}/${admin.id}`)
-          .set(adminAuth)
-          .expect(200)
-          .expect('Content-Type', /application\/json/)
-        expect(response.body).toEqual(formatUser(admin))
-      })
       test('on others', async () => {
         const user = await db.users.find({
           where: { username: env.USER_USERNAME }
@@ -126,7 +115,7 @@ describe('users_api', () => {
   })
 
   describe('POST /api/users', () => {
-    describe('requestcontentcontent validation and sanitization', () => {
+    describe('request content validation and sanitization', () => {
       test('empty', async () => {
         await api
           .post(baseUrl)
@@ -244,9 +233,6 @@ describe('users_api', () => {
   })
 
   describe('DELETE /api/users/:id', () => {
-    // without authentication: not allowed
-    // authenticated as user: allowed only for self
-    // autheticated as admin: allowed
     describe('request validation and sanitization', () => {
       test('invalid UUID', async () => {
         await api
@@ -256,7 +242,7 @@ describe('users_api', () => {
       })
       test('non existing user', async () => {
         const newUser = userWithName('tobedeleted0')
-        const createdUser = await api.post('/api/users').send(newUser)
+        const createdUser = await api.post(baseUrl).send(newUser)
         await api
           .delete(`${baseUrl}/${createdUser.body.id}`)
           .set(adminAuth)
@@ -269,13 +255,13 @@ describe('users_api', () => {
     })
     test('without authentication', async () => {
       const newUser = userWithName('tobedeleted1')
-      const createdUser = await api.post('/api/users').send(newUser)
+      const createdUser = await api.post(baseUrl).send(newUser)
       await api.delete(`${baseUrl}/${createdUser.id}`).expect(401)
     })
     describe('authenticated as user', async () => {
       test('on self', async () => {
         const newUser = userWithName('tobedeleted2')
-        const createdUser = await api.post('/api/users').send(newUser)
+        const createdUser = await api.post(baseUrl).send(newUser)
         const credentials = {
           username: newUser.username,
           password: newUser.password
@@ -300,18 +286,9 @@ describe('users_api', () => {
       })
     })
     describe('authenticated as admin', () => {
-      test('on self', async () => {
-        const user = await db.users.find({
-          where: { username: env.ADMIN_USERNAME }
-        })
-        await api
-          .delete(`${baseUrl}/${user.id}`)
-          .set(adminAuth)
-          .expect(204)
-      })
       test('on others', async () => {
         const newUser = userWithName('tobedeleted3')
-        const createdUser = await api.post('/api/users').send(newUser)
+        const createdUser = await api.post(baseUrl).send(newUser)
         await api
           .delete(`${baseUrl}/${createdUser.body.id}`)
           .set(adminAuth)
@@ -320,24 +297,91 @@ describe('users_api', () => {
     })
   })
 
-  describe.only('PATCH /api/users/:id', () => {
-    // without authentication: not allowed
-    // authenticated as user: allowed only for self
-    // autheticated as admin: allowed
+  describe('PATCH /api/users/:id', () => {
     describe('request validation and sanitization', () => {
       test('invalid UUID', async () => {
-        await api.patch(`${baseUrl}/invaliduuid`).expect(400)
+        await api
+          .patch(`${baseUrl}/invaliduuid`)
+          .set(adminAuth)
+          .expect(400)
       })
-      test('', async () => {})
+      test('non existing user', async () => {
+        const newUser = userWithName('tobepatched0')
+        const createdUser = await api.post(baseUrl).send(newUser)
+        await api.delete(`${baseUrl}/${createdUser.body.id}`).set(adminAuth)
+        await api
+          .patch(`${baseUrl}/${createdUser.body.id}`)
+          .set(adminAuth)
+          .expect(404)
+      })
+      test('patch passwordHash', async () => {
+        const user = await db.users.find({
+          where: { username: env.USER_USERNAME }
+        })
+        await api
+          .patch(`${baseUrl}/${user.id}`)
+          .set(adminAuth)
+          .send({
+            updates: {
+              passwordHash: 'asdasd'
+            }
+          })
+          .expect(400)
+      })
     })
-    describe('without authentication', () => {
-      test('', async () => {})
+    test('without authentication', async () => {
+      const newUser = userWithName('tobepatched1')
+      const createdUser = await api.post(baseUrl).send(newUser)
+      await api.patch(`${baseUrl}/${createdUser.body.id}`).expect(401)
     })
     describe('authenticated as user', () => {
-      test('', async () => {})
+      test('on self', async () => {
+        const user = await db.users.find({
+          where: { username: env.USER_USERNAME }
+        })
+        const response = await api
+          .patch(`${baseUrl}/${user.id}`)
+          .set(userAuth)
+          .send({
+            updates: {
+              name: 'patched'
+            }
+          })
+          .expect(200)
+          .expect('Content-Type', /application\/json/)
+        expect(response.body.name).toBe('patched')
+      })
+      test('on others', async () => {
+        const user = await db.users.find({
+          where: { username: env.DISABLED_USERNAME }
+        })
+        await api
+          .patch(`${baseUrl}/${user.id}`)
+          .set(userAuth)
+          .send({
+            updates: {
+              name: 'patched'
+            }
+          })
+          .expect(401)
+      })
     })
     describe('authenticated as admin', () => {
-      test('', async () => {})
+      test('on others', async () => {
+        const user = await db.users.find({
+          where: { username: env.USER_USERNAME }
+        })
+        const response = await api
+          .patch(`${baseUrl}/${user.id}`)
+          .set(adminAuth)
+          .send({
+            updates: {
+              name: env.USER_USERNAME
+            }
+          })
+          .expect(200)
+        expect(response.body.name).toBe(env.USER_USERNAME)
+      })
     })
   })
 

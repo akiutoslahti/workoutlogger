@@ -10,7 +10,7 @@
     "start": "node index.js",
     "watch": "NODE_ENV=development nodemon index.js",
     "lint": "eslint --fix .",
-    "test": "NODE_ENV=test jest --verbose"
+    "test": "NODE_ENV=test jest --verbose --runInBand"
   },
   "devDependencies": {
     "babel-eslint": "^8.2.3",
