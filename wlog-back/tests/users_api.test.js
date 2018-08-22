@@ -1,8 +1,11 @@
 const supertest = require('supertest')
 const { server, app } = require('../index')
-const { initDatabase } = require('./initDatabase')
+const dbTools = require('./dbTools')
 const env = require('../config/env')
 const db = require('../config/db')
+const bcrypt = require('bcrypt')
+
+const saltRounds = 10
 
 const api = supertest(app)
 const baseUrl = '/api/users'
@@ -22,25 +25,15 @@ const userWithName = (name) => ({
   role: 'user'
 })
 
-describe('users_api', () => {
-  const adminAuth = {}
-  const userAuth = {}
+let adminAuth, userAuth
+
+describe.skip('users_api', () => {
   beforeAll(async () => {
-    await initDatabase()
-    const adminCredentials = {
-      username: env.ADMIN_USERNAME,
-      password: env.ADMIN_PW
-    }
-    const adminLoginResponse = await api
-      .post('/api/login')
-      .send(adminCredentials)
-    adminAuth.Authorization = `bearer ${adminLoginResponse.body.token}`
-    const userCredentials = {
-      username: env.USER_USERNAME,
-      password: env.USER_PW
-    }
-    const userLoginResponse = await api.post('/api/login').send(userCredentials)
-    userAuth.Authorization = `bearer ${userLoginResponse.body.token}`
+    await dbTools.initDatabase()
+    await dbTools.adminLogin(api)
+    await dbTools.userLogin(api)
+    adminAuth = dbTools.adminAuth
+    userAuth = dbTools.userAuth
   })
 
   describe('GET /api/users', () => {
@@ -69,6 +62,17 @@ describe('users_api', () => {
           .get(`${baseUrl}/invaliduuid`)
           .set(adminAuth)
           .expect(400)
+      })
+      test('non existing user', async () => {
+        const newUser = userWithName('tobedeleted0')
+        newUser.passwordHash = await bcrypt.hash(newUser.password, saltRounds)
+        delete newUser.password
+        const createdUser = await db.users.create(newUser)
+        await db.users.destroy({ where: { id: createdUser.id } })
+        await api
+          .get(`${baseUrl}/${createdUser.id}`)
+          .set(adminAuth)
+          .expect(404)
       })
     })
     test('without authentication', async () => {
@@ -242,36 +246,39 @@ describe('users_api', () => {
       })
       test('non existing user', async () => {
         const newUser = userWithName('tobedeleted0')
-        const createdUser = await api.post(baseUrl).send(newUser)
+        newUser.passwordHash = await bcrypt.hash(newUser.password, saltRounds)
+        delete newUser.password
+        const createdUser = await db.users.create(newUser)
+        await db.users.destroy({ where: { id: createdUser.id } })
         await api
-          .delete(`${baseUrl}/${createdUser.body.id}`)
-          .set(adminAuth)
-          .expect(204)
-        await api
-          .delete(`${baseUrl}/${createdUser.body.id}`)
+          .delete(`${baseUrl}/${createdUser.id}`)
           .set(adminAuth)
           .expect(404)
       })
     })
     test('without authentication', async () => {
       const newUser = userWithName('tobedeleted1')
-      const createdUser = await api.post(baseUrl).send(newUser)
+      newUser.passwordHash = await bcrypt.hash(newUser.password, saltRounds)
+      delete newUser.password
+      const createdUser = await db.users.create(newUser)
       await api.delete(`${baseUrl}/${createdUser.id}`).expect(401)
     })
     describe('authenticated as user', async () => {
       test('on self', async () => {
         const newUser = userWithName('tobedeleted2')
-        const createdUser = await api.post(baseUrl).send(newUser)
         const credentials = {
           username: newUser.username,
           password: newUser.password
         }
+        newUser.passwordHash = await bcrypt.hash(newUser.password, saltRounds)
+        delete newUser.password
+        const createdUser = await db.users.create(newUser)
         const userLoginResponse = await api.post('/api/login').send(credentials)
         const delAuth = {
           Authorization: `bearer ${userLoginResponse.body.token}`
         }
         await api
-          .delete(`${baseUrl}/${createdUser.body.id}`)
+          .delete(`${baseUrl}/${createdUser.id}`)
           .set(delAuth)
           .expect(204)
       })
@@ -288,9 +295,11 @@ describe('users_api', () => {
     describe('authenticated as admin', () => {
       test('on others', async () => {
         const newUser = userWithName('tobedeleted3')
-        const createdUser = await api.post(baseUrl).send(newUser)
+        newUser.passwordHash = await bcrypt.hash(newUser.password, saltRounds)
+        delete newUser.password
+        const createdUser = await db.users.create(newUser)
         await api
-          .delete(`${baseUrl}/${createdUser.body.id}`)
+          .delete(`${baseUrl}/${createdUser.id}`)
           .set(adminAuth)
           .expect(204)
       })
@@ -306,11 +315,13 @@ describe('users_api', () => {
           .expect(400)
       })
       test('non existing user', async () => {
-        const newUser = userWithName('tobepatched0')
-        const createdUser = await api.post(baseUrl).send(newUser)
-        await api.delete(`${baseUrl}/${createdUser.body.id}`).set(adminAuth)
+        const newUser = userWithName('tobedeleted0')
+        newUser.passwordHash = await bcrypt.hash(newUser.password, saltRounds)
+        delete newUser.password
+        const createdUser = await db.users.create(newUser)
+        await db.users.destroy({ where: { id: createdUser.id } })
         await api
-          .patch(`${baseUrl}/${createdUser.body.id}`)
+          .patch(`${baseUrl}/${createdUser.id}`)
           .set(adminAuth)
           .expect(404)
       })
@@ -331,8 +342,10 @@ describe('users_api', () => {
     })
     test('without authentication', async () => {
       const newUser = userWithName('tobepatched1')
-      const createdUser = await api.post(baseUrl).send(newUser)
-      await api.patch(`${baseUrl}/${createdUser.body.id}`).expect(401)
+      newUser.passwordHash = await bcrypt.hash(newUser.password, saltRounds)
+      delete newUser.password
+      const createdUser = await db.users.create(newUser)
+      await api.patch(`${baseUrl}/${createdUser.id}`).expect(401)
     })
     describe('authenticated as user', () => {
       test('on self', async () => {

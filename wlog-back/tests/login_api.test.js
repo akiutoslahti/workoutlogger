@@ -1,15 +1,15 @@
 const supertest = require('supertest')
 const { server, app } = require('../index')
-const { initDatabase } = require('./initDatabase')
+const dbTools = require('./dbTools')
 
 const api = supertest(app)
 const env = require('../config/env')
 
 const baseUrl = '/api/login'
 
-describe('login_api', () => {
+describe.skip('login_api', () => {
   beforeAll(async () => {
-    await initDatabase()
+    await dbTools.initDatabase()
   })
   describe('POST /api/login', () => {
     describe('request validation and sanitization', () => {

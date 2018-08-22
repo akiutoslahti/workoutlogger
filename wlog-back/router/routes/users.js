@@ -205,7 +205,7 @@ const usersRouter = (app, db) => {
       }
 
       const updatedUser = await userExists.updateAttributes(updates)
-      return response.status(200).json(updatedUser)
+      return response.status(200).json(formatUser(updatedUser))
     } catch (error) {
       return response
         .status(500)
