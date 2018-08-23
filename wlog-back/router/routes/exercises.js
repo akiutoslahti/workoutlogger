@@ -2,11 +2,21 @@ const validator = require('validator')
 
 const baseUrl = '/api/exercises'
 
+const formatExercise = (exercise) => {
+  const formattedExercise = exercise.toJSON()
+  delete formattedExercise.created_at
+  delete formattedExercise.updated_at
+  return formattedExercise
+}
+
 const exercisesRouter = (app, db) => {
   app.get(baseUrl, async (request, response) => {
     try {
       const allExercises = await db.exercises.findAll()
-      return response.json(allExercises)
+      const formattedExercises = allExercises.map((exercise) =>
+        formatExercise(exercise)
+      )
+      return response.json(formattedExercises)
     } catch (error) {
       return response
         .status(500)
@@ -30,7 +40,7 @@ const exercisesRouter = (app, db) => {
         })
       }
 
-      return response.status(200).json(exerciseById)
+      return response.status(200).json(formatExercise(exerciseById))
     } catch (error) {
       return response
         .status(500)
@@ -40,6 +50,12 @@ const exercisesRouter = (app, db) => {
 
   app.post(baseUrl, async (request, response) => {
     try {
+      const { token } = request
+      if (!token) {
+        return response.status(401).json({
+          error: `GET ${baseUrl} failed because of insufficient priviledges`
+        })
+      }
       const { name, description } = request.body
       if (!name) {
         return response.status(400).json({
@@ -60,7 +76,7 @@ const exercisesRouter = (app, db) => {
       }
 
       const createdExercise = await db.exercises.create(newExercise)
-      return response.status(201).json(createdExercise)
+      return response.status(201).json(formatExercise(createdExercise))
     } catch (error) {
       return response
         .status(500)
@@ -71,6 +87,12 @@ const exercisesRouter = (app, db) => {
   app.delete(`${baseUrl}/:id`, async (request, response) => {
     const { id } = request.params
     try {
+      const { token } = request
+      if (!token) {
+        return response.status(401).json({
+          error: `GET ${baseUrl} failed because of insufficient priviledges`
+        })
+      }
       if (!validator.isUUID(id, 4)) {
         return response.status(400).json({
           error: `DELETE ${baseUrl}/${id} failed because id is not valid`
@@ -84,8 +106,17 @@ const exercisesRouter = (app, db) => {
         })
       }
 
+      const exerciseInUse = await db.workoutsExercises.find({
+        where: { exercise_id: id }
+      })
+      if (exerciseInUse) {
+        return response.status(400).json({
+          error: `DELETE ${baseUrl}/${id} failed because exercise is used in workouts`
+        })
+      }
+
       await db.exercises.destroy({ where: { id } })
-      return response.status(200).send()
+      return response.status(204).send()
     } catch (error) {
       return response
         .status(500)
@@ -96,6 +127,12 @@ const exercisesRouter = (app, db) => {
   app.patch(`${baseUrl}/:id`, async (request, response) => {
     const { id } = request.params
     try {
+      const { token } = request
+      if (!token) {
+        return response.status(401).json({
+          error: `GET ${baseUrl} failed because of insufficient priviledges`
+        })
+      }
       if (!validator.isUUID(id, 4)) {
         return response.status(400).json({
           error: `PATCH ${baseUrl}/${id} failed because id is not valid`
@@ -110,9 +147,20 @@ const exercisesRouter = (app, db) => {
       }
 
       const { updates } = request.body
-      console.log(updates)
+      if (!updates) {
+        return response.status(400).json({
+          error: `PATCH ${baseUrl}/${id} failed because no updates were provided in request`
+        })
+      }
+
+      if (updates.id || updates.name) {
+        return response.status(400).json({
+          error: `PATCH ${baseUrl}/${id} failed because id and/or name cannot be patched`
+        })
+      }
+
       const updatedExercise = await exerciseById.updateAttributes(updates)
-      return response.status(200).json(updatedExercise)
+      return response.status(200).json(formatExercise(updatedExercise))
     } catch (error) {
       return response
         .status(500)

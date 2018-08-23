@@ -46,10 +46,24 @@ const initWorkouts = async () => {
   await db.workouts.create(newWorkout2)
 }
 
+const initExercises = async () => {
+  const newExercise1 = {
+    name: 'squat',
+    description: 'the #1 of all exercises'
+  }
+  const newExercise2 = {
+    name: 'deadlift',
+    description: 'great exercise, only second to squat'
+  }
+  await db.exercises.create(newExercise1)
+  await db.exercises.create(newExercise2)
+}
+
 const initDatabase = async () => {
   await db.sequelize.sync({ force: true })
   await initUsers()
   await initWorkouts()
+  await initExercises()
 }
 
 const adminAuth = {}

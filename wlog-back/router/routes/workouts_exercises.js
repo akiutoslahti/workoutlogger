@@ -2,11 +2,21 @@ const validator = require('validator')
 
 const baseUrl = '/api/workoutsexercises'
 
+const formatWorkoutExercise = (workoutExercise) => {
+  const formattedWorkoutExercise = workoutExercise.toJSON()
+  delete formattedWorkoutExercise.created_at
+  delete formattedWorkoutExercise.updated_at
+  return formattedWorkoutExercise
+}
+
 const workoutsExercisesRouter = (app, db) => {
   app.get(baseUrl, async (request, response) => {
     try {
       const allWorkoutsExercises = await db.workoutsExercises.findAll()
-      return response.json(allWorkoutsExercises)
+      const formattedWorkoutsExercises = allWorkoutsExercises.map(
+        (workoutExercise) => formatWorkoutExercise(workoutExercise)
+      )
+      return response.json(formattedWorkoutsExercises)
     } catch (error) {
       return response
         .status(500)
@@ -32,7 +42,9 @@ const workoutsExercisesRouter = (app, db) => {
         })
       }
 
-      return response.status(200).json(workoutExerciseById)
+      return response
+        .status(200)
+        .json(formatWorkoutExercise(workoutExerciseById))
     } catch (error) {
       return response
         .status(500)
@@ -93,7 +105,9 @@ const workoutsExercisesRouter = (app, db) => {
       const createdWorkoutExercise = db.workoutsExercises.create(
         newWorkoutExercise
       )
-      return response.status(201).json(createdWorkoutExercise)
+      return response
+        .status(201)
+        .json(formatWorkoutExercise(createdWorkoutExercise))
     } catch (error) {
       return response
         .status(500)
@@ -172,7 +186,9 @@ const workoutsExercisesRouter = (app, db) => {
       const updatedWorkoutExercise = await workoutExerciseById.updateAttributes(
         updates
       )
-      return response.status(200).json(updatedWorkoutExercise)
+      return response
+        .status(200)
+        .json(formatWorkoutExercise(updatedWorkoutExercise))
     } catch (error) {
       return response
         .status(500)

@@ -7,7 +7,7 @@ const env = require('../config/env')
 
 const baseUrl = '/api/login'
 
-describe('login_api', () => {
+describe.skip('login_api', () => {
   beforeAll(async () => {
     await dbTools.initDatabase()
   })
