@@ -16,7 +16,7 @@ const newExerciseWithName = (name) => ({
   description: 'generic exercise'
 })
 
-describe('exercises_api', () => {
+describe.skip('exercises_api', () => {
   beforeAll(async () => {
     await dbTools.initDatabase()
     await dbTools.adminLogin(api)
@@ -50,6 +50,7 @@ describe('exercises_api', () => {
         await api.get(`${baseUrl}/${exercise.id}`).expect(404)
       })
     })
+
     test('get existing valid exercise', async () => {
       const exercise = await db.exercises.find()
       await api
@@ -68,6 +69,7 @@ describe('exercises_api', () => {
           .send({ description: 'without name' })
           .expect(400)
       })
+
       test('duplicate', async () => {
         await db.exercises.create(newExerciseWithName('duplicate'))
         await api
@@ -77,12 +79,14 @@ describe('exercises_api', () => {
           .expect(409)
       })
     })
+
     test('without authentication', async () => {
       await api
         .post(baseUrl)
         .send(newExerciseWithName('exercise1'))
         .expect(401)
     })
+
     test('with authentication', async () => {
       const newExercise = newExerciseWithName('exercise2')
       const response = await api
@@ -104,6 +108,7 @@ describe('exercises_api', () => {
           .set(userAuth)
           .expect(400)
       })
+
       test('non existing exercise', async () => {
         const exercise = await db.exercises.create(
           newExerciseWithName('nonexisting')
@@ -115,12 +120,14 @@ describe('exercises_api', () => {
           .expect(404)
       })
     })
+
     test('without authentication', async () => {
       const exercise = await db.exercises.create(
         newExerciseWithName('exercise3')
       )
       await api.delete(`${baseUrl}/${exercise.id}`).expect(401)
     })
+
     describe('with authentication', () => {
       test('exercise without use', async () => {
         const exercise = await db.exercises.create(
@@ -131,6 +138,7 @@ describe('exercises_api', () => {
           .set(userAuth)
           .expect(204)
       })
+
       test('exercise with use', async () => {
         const exercise = await db.exercises.create(
           newExerciseWithName('exercise3')
@@ -161,6 +169,7 @@ describe('exercises_api', () => {
           .set(userAuth)
           .expect(400)
       })
+
       test('non existing UUID', async () => {
         const exercise = await db.exercises.create(
           newExerciseWithName('nonexisting')
@@ -171,6 +180,7 @@ describe('exercises_api', () => {
           .set(userAuth)
           .expect(404)
       })
+
       test('id cannot be changed', async () => {
         const exercise = await db.exercises.create(
           newExerciseWithName('exercise4')
@@ -183,6 +193,7 @@ describe('exercises_api', () => {
           .set(userAuth)
           .expect(400)
       })
+
       test('name cannot be changed', async () => {
         const exercise = await db.exercises.create(
           newExerciseWithName('exercise5')
@@ -196,6 +207,7 @@ describe('exercises_api', () => {
           .expect(400)
       })
     })
+
     test('without authentication', async () => {
       const exercise = await db.exercises.create(
         newExerciseWithName('exercise6')
@@ -207,6 +219,7 @@ describe('exercises_api', () => {
         })
         .expect(401)
     })
+
     test('patch description', async () => {
       const exercise = await db.exercises.create(
         newExerciseWithName('exercise7')

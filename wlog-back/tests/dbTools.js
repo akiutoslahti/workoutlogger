@@ -66,6 +66,8 @@ const initDatabase = async () => {
   await initExercises()
 }
 
+const initWorkoutsExercises = async () => {}
+
 const adminAuth = {}
 const userAuth = {}
 

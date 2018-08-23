@@ -37,12 +37,14 @@ describe.skip('workouts_api', () => {
     test('without authentication', async () => {
       await api.get(baseUrl).expect(401)
     })
+
     test('authenticated as user', async () => {
       await api
         .get(baseUrl)
         .set(userAuth)
         .expect(401)
     })
+
     test('authenticated as admin', async () => {
       await api
         .get(baseUrl)
@@ -51,6 +53,7 @@ describe.skip('workouts_api', () => {
         .expect('Content-Type', /application\/json/)
     })
   })
+
   describe(`GET ${baseUrl}/:id`, () => {
     describe('request validation and sanitization', () => {
       test('invalid UUID', async () => {
@@ -59,6 +62,7 @@ describe.skip('workouts_api', () => {
           .set(adminAuth)
           .expect(400)
       })
+
       test('non existing workout', async () => {
         const createdWorkout = await db.workouts.create(
           newWorkoutWithId(userId)
@@ -70,10 +74,12 @@ describe.skip('workouts_api', () => {
           .expect(404)
       })
     })
+
     test('without authentication', async () => {
       const workout = await db.workouts.find({ where: { user_id: userId } })
       await api.get(`${baseUrl}/${workout.id}`).expect(401)
     })
+
     describe('authenticated as user', async () => {
       test('for self', async () => {
         const workout = await db.workouts.find({ where: { user_id: userId } })
@@ -83,6 +89,7 @@ describe.skip('workouts_api', () => {
           .expect(200)
           .expect('Content-Type', /application\/json/)
       })
+
       test('for others', async () => {
         const workout = await db.workouts.find({ where: { user_id: adminId } })
         await api
@@ -91,6 +98,7 @@ describe.skip('workouts_api', () => {
           .expect(401)
       })
     })
+
     describe('authenticated as admin', () => {
       test('for others', async () => {
         const workout = await db.workouts.find({ where: { user_id: userId } })
@@ -112,6 +120,7 @@ describe.skip('workouts_api', () => {
           .set(adminAuth)
           .expect(400)
       })
+
       test('without date', async () => {
         await api
           .post(baseUrl)
@@ -121,12 +130,14 @@ describe.skip('workouts_api', () => {
           .expect('Content-Type', /application\/json/)
       })
     })
+
     test('without authentication', async () => {
       await api
         .post(baseUrl)
         .send(newWorkoutWithId(userId))
         .expect(401)
     })
+
     describe('authenticated as user', () => {
       test('for self', async () => {
         const newWorkout = newWorkoutWithId(userId)
@@ -137,6 +148,7 @@ describe.skip('workouts_api', () => {
           .expect(201)
           .expect('Content-Type', /application\/json/)
       })
+
       test('for others', async () => {
         await api
           .post(baseUrl)
@@ -145,6 +157,7 @@ describe.skip('workouts_api', () => {
           .expect(401)
       })
     })
+
     describe('authenticated as admin', () => {
       test('for others', async () => {
         await api
@@ -165,6 +178,7 @@ describe.skip('workouts_api', () => {
           .set(adminAuth)
           .expect(400)
       })
+
       test('non existing workout', async () => {
         const createdWorkout = await db.workouts.create(
           newWorkoutWithId(userId)
@@ -176,10 +190,12 @@ describe.skip('workouts_api', () => {
           .expect(404)
       })
     })
+
     test('without authentication', async () => {
       const workout = await db.workouts.find({ where: { user_id: userId } })
       await api.delete(`${baseUrl}/${workout.id}`).expect(401)
     })
+
     describe('authenticated as user', () => {
       test('for self', async () => {
         const workout = await db.workouts.find({ where: { user_id: userId } })
@@ -188,6 +204,7 @@ describe.skip('workouts_api', () => {
           .set(userAuth)
           .expect(204)
       })
+
       test('for others', async () => {
         const workout = await db.workouts.find({ where: { user_id: adminId } })
         await api
@@ -196,6 +213,7 @@ describe.skip('workouts_api', () => {
           .expect(401)
       })
     })
+
     describe('authenticated as admin', () => {
       test('for others', async () => {
         const workout = await db.workouts.find({ where: { user_id: userId } })
@@ -214,6 +232,7 @@ describe.skip('workouts_api', () => {
         .set(userAuth)
         .send(newWorkoutWithId(userId))
     })
+
     describe('request validation and sanitization', () => {
       test('invalid UUID', async () => {
         await api
@@ -221,6 +240,7 @@ describe.skip('workouts_api', () => {
           .set(adminAuth)
           .expect(400)
       })
+
       test('non existing workout', async () => {
         const createdWorkout = await db.workouts.create(
           newWorkoutWithId(userId)
@@ -231,6 +251,7 @@ describe.skip('workouts_api', () => {
           .set(adminAuth)
           .expect(404)
       })
+
       test('patch id', async () => {
         const workout = await db.workouts.find({ where: { user_id: userId } })
         await api
@@ -243,6 +264,7 @@ describe.skip('workouts_api', () => {
           .set(adminAuth)
           .expect(400)
       })
+
       test('patch user_id', async () => {
         const workout = await db.workouts.find({ where: { user_id: userId } })
         await api
@@ -256,6 +278,7 @@ describe.skip('workouts_api', () => {
           .expect(400)
       })
     })
+
     test('without authentication', async () => {
       const workout = await db.workouts.find({ where: { user_id: userId } })
       await api
@@ -267,6 +290,7 @@ describe.skip('workouts_api', () => {
         })
         .expect(401)
     })
+
     describe('authenticated as user', () => {
       test('for self', async () => {
         const workout = await db.workouts.find({ where: { user_id: userId } })
@@ -281,6 +305,7 @@ describe.skip('workouts_api', () => {
           .expect(200)
           .expect('Content-Type', /application\/json/)
       })
+
       test('for others', async () => {
         const workout = await db.workouts.find({ where: { user_id: adminId } })
         await api
@@ -294,6 +319,7 @@ describe.skip('workouts_api', () => {
           .expect(401)
       })
     })
+
     describe('authenticated as admin', () => {
       test('for others', async () => {
         const workout = await db.workouts.find({ where: { user_id: userId } })

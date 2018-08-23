@@ -16,11 +16,13 @@ const usersRouter = (app, db) => {
   app.get(baseUrl, async (request, response) => {
     try {
       const { token } = request
+
       if (!token || token.role !== 'admin') {
         return response.status(401).json({
           error: `GET ${baseUrl} failed because of insufficient priviledges`
         })
       }
+
       const allUsers = await db.users.findAll()
       const formattedUsers = allUsers.map((user) => formatUser(user))
       return response.status(200).json(formattedUsers)
@@ -35,11 +37,13 @@ const usersRouter = (app, db) => {
     const { id } = request.params
     try {
       const { token } = request
+
       if (!token) {
         return response.status(401).json({
           error: `GET ${baseUrl}/${id} failed because of insufficient priviledges`
         })
       }
+
       if (!validator.isUUID(id, 4)) {
         return response.status(400).json({
           error: `GET ${baseUrl}/${id} failed because id is not valid`
@@ -131,11 +135,13 @@ const usersRouter = (app, db) => {
     const { id } = request.params
     try {
       const { token } = request
+
       if (!token) {
         return response.status(401).json({
           error: `DELETE ${baseUrl}/${id} failed because of insufficient priviledges`
         })
       }
+
       if (!validator.isUUID(id, 4)) {
         return response.status(400).json({
           error: `DELETE ${baseUrl}/${id} failed because id is not valid`
@@ -148,6 +154,7 @@ const usersRouter = (app, db) => {
           error: `DELETE ${baseUrl}/${id} failed because user does not exist`
         })
       }
+
       if (token.id !== userExists.id && token.role !== 'admin') {
         return response.status(401).json({
           error: `DELETE ${baseUrl}/${id} failed because of insufficient priviledges`
@@ -167,11 +174,13 @@ const usersRouter = (app, db) => {
     const { id } = request.params
     try {
       const { token } = request
+
       if (!token) {
         return response.status(401).json({
           error: `DELETE ${baseUrl}/${id} failed because of insufficient priviledges`
         })
       }
+
       if (!validator.isUUID(id, 4)) {
         return response.status(400).json({
           error: `PATCH ${baseUrl}/${id} failed because id is not valid`
@@ -205,7 +214,7 @@ const usersRouter = (app, db) => {
       }
 
       if (updates.role === 'admin' && token.role != 'admin') {
-        return response.status(400).json({
+        return response.status(401).json({
           error: `PATCH ${baseUrl}/${id} failed because only admin can promote new admins`
         })
       }
