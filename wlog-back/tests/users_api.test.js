@@ -28,7 +28,7 @@ const newUserWithName = (name) => ({
 let adminAuth
 let userAuth
 
-describe.skip('users_api', () => {
+describe('users_api', () => {
   beforeAll(async () => {
     await dbTools.initDatabase()
     await dbTools.adminLogin(api)

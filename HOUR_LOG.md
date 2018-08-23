@@ -8,4 +8,4 @@
 | 13.08.2018 |   1   | planning for testing strategies                                                                                                    |
 | 21.08.2018 |   2   | troubleshooting with testing                                                                                                       |
 | 22.08.2018 |  12   | more troubleshooting with testing, writing tests to login, users and workouts routes                                               |
-| 23.08.2018 |   6   | writing more tests                                                                                                                 |
+| 23.08.2018 |   8   | writing more tests                                                                                                                 |

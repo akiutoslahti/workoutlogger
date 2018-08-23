@@ -16,7 +16,7 @@ const newExerciseWithName = (name) => ({
   description: 'generic exercise'
 })
 
-describe.skip('exercises_api', () => {
+describe('exercises_api', () => {
   beforeAll(async () => {
     await dbTools.initDatabase()
     await dbTools.adminLogin(api)

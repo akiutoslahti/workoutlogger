@@ -205,6 +205,13 @@ const workoutsExercisesRouter = (app, db) => {
   app.patch(`${baseUrl}/:id`, async (request, response) => {
     const { id } = request.params
     try {
+      const { token } = request
+      if (!token) {
+        return response.status(401).json({
+          error: `PATCH ${baseUrl}/${id} failed because of insufficient priviledges`
+        })
+      }
+
       if (!validator.isUUID(id, 4)) {
         return response.status(400).json({
           error: `PATCH ${baseUrl}/${id} failed because id is not valid`
@@ -220,24 +227,43 @@ const workoutsExercisesRouter = (app, db) => {
         })
       }
 
+      const workoutById = await db.workouts.find({
+        where: { id: workoutExerciseById.workout_id }
+      })
+      if (workoutById.user_id !== token.id && token.role !== 'admin') {
+        return response.status(401).json({
+          error: `PATCH ${baseUrl}/${id} failed because if insufficient priviledges`
+        })
+      }
+
       const { updates } = request.body
-      if (updates.workout_id || updates.exercise_id) {
-        return response.status(404).json({
-          error: `PATCH ${baseUrl}/${id} failed because updating workout_id and/or exercise_id is not allowed`
+
+      if (!updates) {
+        return response.status(400).json({
+          error: `PATCH ${baseUrl}/${id} failed because no updates were provided with request`
         })
       }
 
-      if (!validator.isInt(updates.set_count) || updates.set_count < 1) {
-        return response.status(404).json({
-          error: `PATCH ${baseUrl}/${id} failed because set_count is not positive integer`
+      if (updates.workout_id || updates.exercise_id || updates.id) {
+        return response.status(400).json({
+          error: `PATCH ${baseUrl}/${id} failed because updating id and/or workout_id and/or exercise_id is not allowed`
         })
       }
 
-      if (
-        !validator.isInt(updates.repetition_count) ||
-        updates.repetition_count < 1
-      ) {
-        return response.status(404).json({
+      if (updates.set_count && updates.set_count < 1) {
+        return response.status(400).json({
+          error: `PATCH ${baseUrl}/${id} failed because repetition_count is not positive integer`
+        })
+      }
+
+      if (updates.repetition_count && updates.repetition_count < 1) {
+        return response.status(400).json({
+          error: `PATCH ${baseUrl}/${id} failed because repetition_count is not positive integer`
+        })
+      }
+
+      if (updates.weight && updates.weight < 1) {
+        return response.status(400).json({
           error: `PATCH ${baseUrl}/${id} failed because repetition_count is not positive integer`
         })
       }

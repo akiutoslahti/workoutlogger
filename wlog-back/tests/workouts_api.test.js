@@ -18,7 +18,7 @@ const newWorkoutWithId = (id) => ({
   date: new Date()
 })
 
-describe.skip('workouts_api', () => {
+describe('workouts_api', () => {
   beforeAll(async () => {
     await dbTools.initDatabase()
     await dbTools.adminLogin(api)
