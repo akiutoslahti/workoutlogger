@@ -180,6 +180,12 @@ const workoutsRouter = (app, db) => {
       }
 
       const { updates } = request.body
+      if (!updates) {
+        return response.status(400).json({
+          error: `PATCH ${baseUrl}/${id} failed because no updates were provided in request`
+        })
+      }
+
       if (updates.user_id || updates.id) {
         return response.status(400).json({
           error: `DELETE ${baseUrl}/${id} failed because only date can be patched`

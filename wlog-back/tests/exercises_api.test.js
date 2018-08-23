@@ -8,9 +8,7 @@ const env = require('../config/env')
 
 const baseUrl = '/api/exercises'
 
-let adminAuth
 let userAuth
-let adminId
 let userId
 
 const newExerciseWithName = (name) => ({
@@ -23,11 +21,7 @@ describe('exercises_api', () => {
     await dbTools.initDatabase()
     await dbTools.adminLogin(api)
     await dbTools.userLogin(api)
-    ;({ adminAuth, userAuth } = dbTools)
-    const admin = await db.users.find({
-      where: { username: env.ADMIN_USERNAME }
-    })
-    adminId = admin.id
+    ;({ userAuth } = dbTools)
     const user = await db.users.find({
       where: { username: env.USER_USERNAME }
     })
@@ -184,7 +178,7 @@ describe('exercises_api', () => {
         await api
           .patch(`${baseUrl}/${exercise.id}`)
           .send({
-            updates: { id: '693df0d2-f038-4121-83f6-cc28130876c9' }
+            updates: { id: 'newUUID' }
           })
           .set(userAuth)
           .expect(400)

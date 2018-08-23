@@ -192,6 +192,24 @@ const usersRouter = (app, db) => {
       }
 
       const { updates } = request.body
+      if (!updates) {
+        return response.status(400).json({
+          error: `PATCH ${baseUrl}/${id} failed because no updates were provided in request`
+        })
+      }
+
+      if (updates.id) {
+        return response.status(400).json({
+          error: `PATCH ${baseUrl}/${id} failed because id cannot be patched`
+        })
+      }
+
+      if (updates.role === 'admin' && token.role != 'admin') {
+        return response.status(400).json({
+          error: `PATCH ${baseUrl}/${id} failed because only admin can promote new admins`
+        })
+      }
+
       if (updates.passwordHash) {
         return response.status(400).json({
           error: `PATCH ${baseUrl}/${id} failed because passwordHash cannot be changed directly`
