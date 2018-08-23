@@ -59,14 +59,39 @@ const initExercises = async () => {
   await db.exercises.create(newExercise2)
 }
 
+const initWorkoutsExercises = async () => {
+  const admin = await db.users.find({ where: { username: env.ADMIN_USERNAME } })
+  const adminWorkout = await db.workouts.find({ where: { user_id: admin.id } })
+  const squat = await db.exercises.find({ where: { name: 'squat' } })
+  const newWorkoutExercise1 = {
+    workout_id: adminWorkout.id,
+    exercise_id: squat.id,
+    set_count: 3,
+    repetition_count: 5,
+    weight: 100
+  }
+  await db.workoutsExercises.create(newWorkoutExercise1)
+
+  const user = await db.users.find({ where: { username: env.USER_USERNAME } })
+  const userWorkout = await db.workouts.find({ where: { user_id: user.id } })
+  const deadlift = await db.exercises.find({ where: { name: 'deadlift' } })
+  const newWorkoutExercise2 = {
+    workout_id: userWorkout.id,
+    exercise_id: deadlift.id,
+    set_count: 1,
+    repetition_count: 5,
+    weight: 120
+  }
+  await db.workoutsExercises.create(newWorkoutExercise2)
+}
+
 const initDatabase = async () => {
   await db.sequelize.sync({ force: true })
   await initUsers()
   await initWorkouts()
   await initExercises()
+  await initWorkoutsExercises()
 }
-
-const initWorkoutsExercises = async () => {}
 
 const adminAuth = {}
 const userAuth = {}
