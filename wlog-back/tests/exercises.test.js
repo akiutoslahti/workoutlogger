@@ -6,16 +6,16 @@ const db = require('../config/db')
 const api = supertest(app)
 const env = require('../config/env')
 
-const baseUrl = '/api/workoutsexercises'
+const baseUrl = '/api/exercises'
 
 let adminAuth
 let userAuth
 let adminId
 let userId
 
-const newWorkoutExercise = () => ({})
+const newExerciseWithName = (name) => ({})
 
-describe.skip('workoutsexercises_api', () => {
+describe('exercises_api', () => {
   beforeAll(async () => {
     await dbTools.initDatabase()
     await dbTools.adminLogin(api)
@@ -30,13 +30,15 @@ describe.skip('workoutsexercises_api', () => {
     })
     userId = user.id
   })
-  describe(`GET ${baseUrl}`, () => {
-    test('', async () => {})
-  })
+  describe(`GET ${baseUrl}`, () => {})
   describe(`GET ${baseUrl}/:id`, () => {})
+
   describe(`POST ${baseUrl}`, () => {})
+
   describe(`DELETE ${baseUrl}/:id`, () => {})
+
   describe(`PATCH ${baseUrl}/:id`, () => {})
+
   afterAll(() => {
     server.close()
   })
