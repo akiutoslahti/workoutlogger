@@ -212,7 +212,7 @@ const usersRouter = (app, db) => {
         })
       }
 
-      if (updates.role === 'admin' && token.role != 'admin') {
+      if (updates.role === 'admin' && token.role !== 'admin') {
         return response.status(401).json({
           error: `PATCH ${baseUrl}/${id} failed because only admin can promote new admins`
         })

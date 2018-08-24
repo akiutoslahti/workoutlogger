@@ -53,9 +53,7 @@ describe('users_api', () => {
         .expect(200)
         .set(adminAuth)
         .expect('Content-Type', /application\/json/)
-      const extraProps = Object.keys(response.body[0]).filter((prop) => {
-        !expectedProps.includes(prop)
-      })
+      const extraProps = Object.keys(response.body[0]).filter((prop) => !expectedProps.includes(prop))
       expect(extraProps.length).toBe(0)
     })
 
@@ -167,19 +165,19 @@ describe('users_api', () => {
 
     test('should 400 w/o name, username, role or password', async () => {
       const badUsers = []
-      for (let i = 0; i < 4; i++) {
+      for (let i = 0; i < 4; i += 1) {
         badUsers.push({ ...newUser })
       }
       delete badUsers[0].name
       delete badUsers[1].username
       delete badUsers[2].role
       delete badUsers[3].password
-      const promiseArray = badUsers.map((badUser) => {
-        return api
+      const promiseArray = badUsers.map((badUser) =>
+        api
           .post(baseUrl)
           .send(badUser)
           .expect(400)
-      })
+      )
       await Promise.all(promiseArray)
     })
 
@@ -377,15 +375,15 @@ describe('users_api', () => {
           updates: { passwordHash: '<adsjsfg97hgu' }
         }
       ]
-      const promiseArray = badUpdates.map((badUpdate) => {
-        return api
+      const promiseArray = badUpdates.map((badUpdate) =>
+        api
           .patch(`${baseUrl}/${user.id}`)
           .send(badUpdate)
           .set(userAuth)
           .then((response) => {
             expect(response.status).toBe(400)
           })
-      })
+      )
       await Promise.all(promiseArray)
     })
   })

@@ -15,14 +15,12 @@ describe('login_api', () => {
   describe(`POST ${baseUrl}`, () => {
     test('should 400 w/o username or password', async () => {
       const badLogins = [{}, { username: '' }, { password: '' }]
-      const promiseArray = badLogins.map((badLogin) => {
-        return api
+      const promiseArray = badLogins.map((badLogin) => api
           .post(baseUrl)
           .send(badLogin)
           .then((response) => {
             expect(response.status).toBe(400)
-          })
-      })
+          }))
       await Promise.all(promiseArray)
     })
 
@@ -58,7 +56,7 @@ describe('login_api', () => {
         .send(adminLogin)
         .expect(200)
         .expect('Content-Type', /application\/json/)
-      let responseKeys = Object.keys(response.body)
+      const responseKeys = Object.keys(response.body)
       expect(responseKeys.includes('token')).toBe(true)
     })
 
@@ -72,7 +70,7 @@ describe('login_api', () => {
         .send(credentials)
         .expect(200)
         .expect('Content-Type', /application\/json/)
-      let responseKeys = Object.keys(response.body)
+      const responseKeys = Object.keys(response.body)
       expect(responseKeys.includes('token')).toBe(true)
     })
 

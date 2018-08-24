@@ -9,4 +9,4 @@
 | 21.08.2018 |   2   | troubleshooting with testing                                                                                                       |
 | 22.08.2018 |  12   | more troubleshooting with testing, writing tests to login, users and workouts routes                                               |
 | 23.08.2018 |   8   | writing more tests                                                                                                                 |
-| 24.08.2018 |   8   | changes to api, refactored tests                                                                                                   |
+| 24.08.2018 |  10   | changes to api, refactored tests, frontend started                                                                                 |

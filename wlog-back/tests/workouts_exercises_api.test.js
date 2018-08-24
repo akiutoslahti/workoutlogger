@@ -53,9 +53,7 @@ describe('workoutsexercises_api', () => {
         .get(baseUrl)
         .expect(200)
         .expect('Content-Type', /application\/json/)
-      const extraProps = Object.keys(response.body[0]).filter((prop) => {
-        !expectedProps.includes(prop)
-      })
+      const extraProps = Object.keys(response.body[0]).filter((prop) => !expectedProps.includes(prop))
       expect(extraProps.length).toBe(0)
     })
   })
@@ -154,7 +152,7 @@ describe('workoutsexercises_api', () => {
 
     test('should 400 w/o workout_id, exercise_id, set_count, repetition_count or weight', async () => {
       const badWorkoutsExercises = []
-      for (let i = 0; i < 5; i++) {
+      for (let i = 0; i < 5; i += 1) {
         badWorkoutsExercises.push({ ...newWorkoutExercise })
       }
       delete badWorkoutsExercises[0].workout_id
@@ -162,34 +160,34 @@ describe('workoutsexercises_api', () => {
       delete badWorkoutsExercises[2].set_count
       delete badWorkoutsExercises[3].repetition_count
       delete badWorkoutsExercises[4].weight
-      const promiseArray = badWorkoutsExercises.map((badWorkoutExercise) => {
-        return api
+      const promiseArray = badWorkoutsExercises.map((badWorkoutExercise) =>
+        api
           .post(baseUrl)
           .send(badWorkoutExercise)
           .set(userAuth)
           .then((response) => {
             expect(response.status).toBe(400)
           })
-      })
+      )
       await Promise.all(promiseArray)
     })
 
     test('should 404 w/ non-existing workout_id or exercise_id', async () => {
       const badWorkoutsExercises = []
-      for (let i = 0; i < 2; i++) {
+      for (let i = 0; i < 2; i += 1) {
         badWorkoutsExercises.push({ ...newWorkoutExercise })
       }
       badWorkoutsExercises[0].workout_id = uuidv4()
       badWorkoutsExercises[1].exercise_id = uuidv4()
-      const promiseArray = badWorkoutsExercises.map((badWorkoutExercise) => {
-        return api
+      const promiseArray = badWorkoutsExercises.map((badWorkoutExercise) =>
+        api
           .post(baseUrl)
           .send(badWorkoutExercise)
           .set(userAuth)
           .then((response) => {
             expect(response.status).toBe(404)
           })
-      })
+      )
       await Promise.all(promiseArray)
     })
 
@@ -323,15 +321,15 @@ describe('workoutsexercises_api', () => {
           updates: { exercise_id: uuidv4() }
         }
       ]
-      const promiseArray = badUpdates.map((badUpdate) => {
-        return api
+      const promiseArray = badUpdates.map((badUpdate) =>
+        api
           .patch(`${baseUrl}/${workoutExercise.id}`)
           .send(badUpdate)
           .set(userAuth)
           .then((response) => {
             expect(response.status).toBe(400)
           })
-      })
+      )
       await Promise.all(promiseArray)
     })
   })

@@ -39,9 +39,7 @@ describe('exercises_api', () => {
         .get(baseUrl)
         .expect(200)
         .expect('Content-Type', /application\/json/)
-      const extraProps = Object.keys(response.body[0]).filter((prop) => {
-        !expectedProps.includes(prop)
-      })
+      const extraProps = Object.keys(response.body[0]).filter((prop) => !expectedProps.includes(prop))
       expect(extraProps.length).toBe(0)
     })
   })
@@ -202,14 +200,14 @@ describe('exercises_api', () => {
           updates: { id: uuidv4() }
         }
       ]
-      const promiseArray = badUpdates.map((badUpdate) => {
-        return api
+      const promiseArray = badUpdates.map((badUpdate) =>
+        api
           .patch(`${baseUrl}/${exercise.id}`)
           .send(badUpdate)
           .then((response) => {
             expect(response.status).toBe(400)
           })
-      })
+      )
       await Promise.all(promiseArray)
     })
   })

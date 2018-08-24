@@ -52,9 +52,7 @@ describe('workouts_api', () => {
         .get(baseUrl)
         .expect(200)
         .expect('Content-Type', /application\/json/)
-      const extraProps = Object.keys(response.body[0]).filter((prop) => {
-        !expectedProps.includes(prop)
-      })
+      const extraProps = Object.keys(response.body[0]).filter((prop) => !expectedProps.includes(prop))
       expect(extraProps.length).toBe(0)
     })
   })
@@ -238,15 +236,15 @@ describe('workouts_api', () => {
           updates: { user_id: uuidv4() }
         }
       ]
-      const promiseArray = badUpdates.map((badUpdate) => {
-        return api
+      const promiseArray = badUpdates.map((badUpdate) =>
+        api
           .patch(`${baseUrl}/${workout.id}`)
           .send(badUpdate)
           .set(userAuth)
           .then((response) => {
             expect(response.status).toBe(400)
           })
-      })
+      )
       await Promise.all(promiseArray)
     })
   })
