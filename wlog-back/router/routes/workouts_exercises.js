@@ -12,17 +12,11 @@ const formatWorkoutExercise = (workoutExercise) => {
 const workoutsExercisesRouter = (app, db) => {
   app.get(baseUrl, async (request, response) => {
     try {
-      const { token } = request
-      if (!token || token.role !== 'admin') {
-        return response.status(401).json({
-          error: `GET ${baseUrl} failed because of insufficient priviledges`
-        })
-      }
-
       const allWorkoutsExercises = await db.workoutsExercises.findAll()
       const formattedWorkoutsExercises = allWorkoutsExercises.map(
         (workoutExercise) => formatWorkoutExercise(workoutExercise)
       )
+
       return response.json(formattedWorkoutsExercises)
     } catch (error) {
       return response
@@ -34,13 +28,6 @@ const workoutsExercisesRouter = (app, db) => {
   app.get(`${baseUrl}/:id`, async (request, response) => {
     const { id } = request.params
     try {
-      const { token } = request
-      if (!token) {
-        return response.status(401).json({
-          error: `GET ${baseUrl}/${id} failed because of insufficient priviledges`
-        })
-      }
-
       if (!validator.isUUID(id, 4)) {
         return response.status(400).json({
           error: `GET ${baseUrl}/${id} failed because id is not valid`
@@ -53,15 +40,6 @@ const workoutsExercisesRouter = (app, db) => {
       if (!workoutExerciseById) {
         return response.status(404).json({
           error: `GET ${baseUrl}/${id} failed because workoutExercise does not exist`
-        })
-      }
-
-      const workoutById = await db.workouts.find({
-        where: { id: workoutExerciseById.workout_id }
-      })
-      if (workoutById.user_id !== token.id && token.role !== 'admin') {
-        return response.status(401).json({
-          error: `GET ${baseUrl}/${id} failed because if insufficient priviledges`
         })
       }
 
@@ -92,13 +70,13 @@ const workoutsExercisesRouter = (app, db) => {
         })
       }
 
-      if (!validator.isUUID(workout_id, 4)) {
+      if (!workout_id || !validator.isUUID(workout_id, 4)) {
         return response.status(400).json({
           error: `POST ${baseUrl} failed because workout_id is invalid`
         })
       }
 
-      if (!validator.isUUID(exercise_id, 4)) {
+      if (!exercise_id || !validator.isUUID(exercise_id, 4)) {
         return response.status(400).json({
           error: `POST ${baseUrl} failed because exercise_id is invalid`
         })
@@ -129,6 +107,12 @@ const workoutsExercisesRouter = (app, db) => {
         })
       }
 
+      if (workoutById.user_id !== token.id) {
+        return response.status(401).json({
+          error: `POST ${baseUrl} failed because of insufficient priviledges`
+        })
+      }
+
       const exerciseById = await db.exercises.find({
         where: { id: exercise_id }
       })
@@ -146,7 +130,7 @@ const workoutsExercisesRouter = (app, db) => {
         weight
       }
 
-      const createdWorkoutExercise = db.workoutsExercises.create(
+      const createdWorkoutExercise = await db.workoutsExercises.create(
         newWorkoutExercise
       )
       return response
@@ -187,7 +171,7 @@ const workoutsExercisesRouter = (app, db) => {
       const workoutById = await db.workouts.find({
         where: { id: workoutExerciseById.workout_id }
       })
-      if (workoutById.user_id !== token.id && token.role !== 'admin') {
+      if (workoutById.user_id !== token.id) {
         return response.status(401).json({
           error: `DELETE ${baseUrl}/${id} failed because if insufficient priviledges`
         })
@@ -230,7 +214,7 @@ const workoutsExercisesRouter = (app, db) => {
       const workoutById = await db.workouts.find({
         where: { id: workoutExerciseById.workout_id }
       })
-      if (workoutById.user_id !== token.id && token.role !== 'admin') {
+      if (workoutById.user_id !== token.id) {
         return response.status(401).json({
           error: `PATCH ${baseUrl}/${id} failed because if insufficient priviledges`
         })

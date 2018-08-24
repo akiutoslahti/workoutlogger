@@ -16,6 +16,7 @@ const exercisesRouter = (app, db) => {
       const formattedExercises = allExercises.map((exercise) =>
         formatExercise(exercise)
       )
+
       return response.json(formattedExercises)
     } catch (error) {
       return response
@@ -50,12 +51,6 @@ const exercisesRouter = (app, db) => {
 
   app.post(baseUrl, async (request, response) => {
     try {
-      const { token } = request
-      if (!token) {
-        return response.status(401).json({
-          error: `GET ${baseUrl} failed because of insufficient priviledges`
-        })
-      }
       const { name, description } = request.body
       if (!name) {
         return response.status(400).json({
@@ -87,12 +82,6 @@ const exercisesRouter = (app, db) => {
   app.delete(`${baseUrl}/:id`, async (request, response) => {
     const { id } = request.params
     try {
-      const { token } = request
-      if (!token) {
-        return response.status(401).json({
-          error: `GET ${baseUrl} failed because of insufficient priviledges`
-        })
-      }
       if (!validator.isUUID(id, 4)) {
         return response.status(400).json({
           error: `DELETE ${baseUrl}/${id} failed because id is not valid`
@@ -127,12 +116,6 @@ const exercisesRouter = (app, db) => {
   app.patch(`${baseUrl}/:id`, async (request, response) => {
     const { id } = request.params
     try {
-      const { token } = request
-      if (!token) {
-        return response.status(401).json({
-          error: `GET ${baseUrl} failed because of insufficient priviledges`
-        })
-      }
       if (!validator.isUUID(id, 4)) {
         return response.status(400).json({
           error: `PATCH ${baseUrl}/${id} failed because id is not valid`

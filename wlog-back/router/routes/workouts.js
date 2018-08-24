@@ -4,6 +4,7 @@ const baseUrl = '/api/workouts'
 
 const formatWorkout = (workout) => {
   const formattedWorkout = workout.toJSON()
+  formattedWorkout.date = String(formattedWorkout.date)
   delete formattedWorkout.created_at
   delete formattedWorkout.updated_at
   return formattedWorkout
@@ -12,13 +13,6 @@ const formatWorkout = (workout) => {
 const workoutsRouter = (app, db) => {
   app.get(baseUrl, async (request, response) => {
     try {
-      const { token } = request
-      if (!token || token.role !== 'admin') {
-        return response.status(401).json({
-          error: `GET ${baseUrl} failed because of insufficient priviledges`
-        })
-      }
-
       const allWorkouts = await db.workouts.findAll()
       const formattedWorkouts = allWorkouts.map((workout) =>
         formatWorkout(workout)
@@ -34,13 +28,6 @@ const workoutsRouter = (app, db) => {
   app.get(`${baseUrl}/:id`, async (request, response) => {
     const { id } = request.params
     try {
-      const { token } = request
-      if (!token) {
-        return response.status(401).json({
-          error: `GET ${baseUrl} failed because of insufficient priviledges`
-        })
-      }
-
       if (!validator.isUUID(id, 4)) {
         return response.status(400).json({
           error: `GET ${baseUrl}/${id} failed because id is not valid`
@@ -51,12 +38,6 @@ const workoutsRouter = (app, db) => {
       if (!workoutById) {
         return response.status(404).json({
           error: `GET ${baseUrl}/${id} failed because workout does not exist`
-        })
-      }
-
-      if (!(workoutById.user_id === token.id || token.role === 'admin')) {
-        return response.status(401).json({
-          error: `GET ${baseUrl}/${id} failed because of insufficient priviledges`
         })
       }
 
@@ -77,29 +58,17 @@ const workoutsRouter = (app, db) => {
         })
       }
 
-      const { user_id, date } = request.body
-      if (!user_id || !validator.isUUID(user_id, 4)) {
-        return response.status(400).json({
-          error: `POST ${baseUrl} failed because user id is missing or invalid`
-        })
-      }
-
-      const userById = db.users.find({ where: { id: user_id } })
+      const userById = db.users.find({ where: { id: token.id } })
       if (!userById) {
         return response.status(400).json({
           error: `POST ${baseUrl} failed because user does not exist`
         })
       }
 
-      if (!(user_id === token.id || token.role === 'admin')) {
-        return response.status(401).json({
-          error: `POST ${baseUrl} failed because of insufficient priviledges`
-        })
-      }
-
+      const { date } = request.body
       const newWorkout = {
-        user_id,
-        date: !date ? Date.now() : date
+        user_id: token.id,
+        date: !date ? Date() : date
       }
 
       const createdWorkout = await db.workouts.create(newWorkout)
@@ -135,7 +104,7 @@ const workoutsRouter = (app, db) => {
         })
       }
 
-      if (!(workoutById.user_id === token.id || token.role === 'admin')) {
+      if (workoutById.user_id !== token.id) {
         return response.status(401).json({
           error: `DELETE ${baseUrl}/${id} failed because of insufficient priviledges`
         })
@@ -173,7 +142,7 @@ const workoutsRouter = (app, db) => {
         })
       }
 
-      if (!(workoutById.user_id === token.id || token.role === 'admin')) {
+      if (!(workoutById.user_id === token.id)) {
         return response.status(401).json({
           error: `DELETE ${baseUrl}/${id} failed because of insufficient priviledges`
         })

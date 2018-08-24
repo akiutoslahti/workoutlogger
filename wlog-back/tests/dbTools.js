@@ -31,56 +31,32 @@ const initUsers = async () => {
 }
 
 const initWorkouts = async () => {
-  const admin = await db.users.find({ where: { username: env.ADMIN_USERNAME } })
-  const newWorkout1 = {
-    user_id: admin.id,
-    date: Date.now()
-  }
-  await db.workouts.create(newWorkout1)
-
   const user = await db.users.find({ where: { username: env.USER_USERNAME } })
-  const newWorkout2 = {
+  const newWorkout = {
     user_id: user.id,
     date: Date.now()
   }
-  await db.workouts.create(newWorkout2)
+  await db.workouts.create(newWorkout)
 }
 
 const initExercises = async () => {
-  const newExercise1 = {
+  const newExercise = {
     name: 'squat',
     description: 'the #1 of all exercises'
   }
-  const newExercise2 = {
-    name: 'deadlift',
-    description: 'great exercise, only second to squat'
-  }
-  await db.exercises.create(newExercise1)
-  await db.exercises.create(newExercise2)
+  await db.exercises.create(newExercise)
 }
 
 const initWorkoutsExercises = async () => {
-  const admin = await db.users.find({ where: { username: env.ADMIN_USERNAME } })
-  const adminWorkout = await db.workouts.find({ where: { user_id: admin.id } })
-  const squat = await db.exercises.find({ where: { name: 'squat' } })
-  const newWorkoutExercise1 = {
-    workout_id: adminWorkout.id,
-    exercise_id: squat.id,
-    set_count: 3,
-    repetition_count: 5,
-    weight: 100
-  }
-  await db.workoutsExercises.create(newWorkoutExercise1)
-
   const user = await db.users.find({ where: { username: env.USER_USERNAME } })
   const userWorkout = await db.workouts.find({ where: { user_id: user.id } })
-  const deadlift = await db.exercises.find({ where: { name: 'deadlift' } })
+  const deadlift = await db.exercises.find({ where: { name: 'squat' } })
   const newWorkoutExercise2 = {
     workout_id: userWorkout.id,
     exercise_id: deadlift.id,
-    set_count: 1,
+    set_count: 3,
     repetition_count: 5,
-    weight: 120
+    weight: 100
   }
   await db.workoutsExercises.create(newWorkoutExercise2)
 }

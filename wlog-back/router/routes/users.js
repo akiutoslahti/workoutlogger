@@ -37,7 +37,6 @@ const usersRouter = (app, db) => {
     const { id } = request.params
     try {
       const { token } = request
-
       if (!token) {
         return response.status(401).json({
           error: `GET ${baseUrl}/${id} failed because of insufficient priviledges`
