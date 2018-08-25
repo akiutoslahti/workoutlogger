@@ -3,9 +3,9 @@ import { BrowserRouter as Router } from 'react-router-dom'
 import { connect } from 'react-redux'
 import PropTypes from 'prop-types'
 import { Container } from 'semantic-ui-react'
-import LoginForm from './components/LoginForm'
-import Navigation from './components/Navigation'
-import Notification from './components/Notification'
+import LoginForm from './components/LoginForm/LoginFormContainer'
+import NavigationBar from './components/NavigationBar/NavigationBarContainer'
+import Notification from './components/Notification/NotificationContainer'
 import { login } from './reducers/loginreducer'
 
 class App extends React.Component {
@@ -31,7 +31,7 @@ class App extends React.Component {
             <LoginForm />
           ) : (
             <div>
-              <Navigation />
+              <NavigationBar />
               <Notification />
               <p>hello world!</p>
             </div>

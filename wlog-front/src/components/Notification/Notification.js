@@ -1,6 +1,5 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import { connect } from 'react-redux'
 import { Message } from 'semantic-ui-react'
 
 const Notification = ({ notification }) => {
@@ -31,10 +30,4 @@ Notification.propTypes = {
   }).isRequired
 }
 
-const mapStateToProps = (state) => ({
-  notification: state.notification
-})
-
-const ConnectedNotification = connect(mapStateToProps)(Notification)
-
-export default ConnectedNotification
+export default Notification
