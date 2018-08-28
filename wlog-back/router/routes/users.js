@@ -12,6 +12,14 @@ const formatUser = (user) => {
   return formattedUser
 }
 
+const formatWorkout = (workout) => {
+  const formattedWorkout = workout.toJSON()
+  formattedWorkout.date = String(formattedWorkout.date)
+  delete formattedWorkout.created_at
+  delete formattedWorkout.updated_at
+  return formattedWorkout
+}
+
 const usersRouter = (app, db) => {
   app.get(baseUrl, async (request, response) => {
     try {
@@ -66,6 +74,51 @@ const usersRouter = (app, db) => {
       }
 
       return response.status(200).json(formatUser(userById))
+    } catch (error) {
+      return response
+        .status(500)
+        .json({ error: `GET ${baseUrl}/${id} failed because of error` })
+    }
+  })
+
+  app.get(`${baseUrl}/:id/workouts`, async (request, response) => {
+    const { id } = request.params
+    try {
+      const { token } = request
+      if (!token) {
+        return response.status(401).json({
+          error: `GET ${baseUrl}/${id} failed because of insufficient priviledges`
+        })
+      }
+
+      if (!validator.isUUID(id, 4)) {
+        return response.status(400).json({
+          error: `GET ${baseUrl}/${id} failed because id is not valid`
+        })
+      }
+
+      if (!(token.id === id || token.role === 'admin')) {
+        return response.status(401).json({
+          error: `GET ${baseUrl}/${id} failed because of insufficient priviledges`
+        })
+      }
+
+      const userById = await db.users.find({
+        where: { id }
+      })
+
+      if (!userById) {
+        return response.status(404).json({
+          error: `GET ${baseUrl}/${id} failed because user does not exist`
+        })
+      }
+
+      const userWorkouts = await db.workouts.findAll({ where: { user_id: id } })
+      const formattedWorkouts = userWorkouts.map((userWorkout) =>
+        formatWorkout(userWorkout)
+      )
+
+      return response.status(200).json(formattedWorkouts)
     } catch (error) {
       return response
         .status(500)

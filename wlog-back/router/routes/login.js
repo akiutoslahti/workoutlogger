@@ -38,10 +38,11 @@ const loginRouter = (app, db) => {
     const token = jwt.sign(userForToken, env.JWT_SECRET)
 
     return response.status(200).json({
-      token,
-      username: user.username,
+      id: user.id,
       name: user.name,
-      role: user.role
+      username: user.username,
+      role: user.role,
+      token
     })
   })
 }
