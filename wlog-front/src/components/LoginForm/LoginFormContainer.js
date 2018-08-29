@@ -2,6 +2,7 @@ import React from 'react'
 import { connect } from 'react-redux'
 import PropTypes from 'prop-types'
 import { login } from '../../reducers/loginreducer'
+import { initWorkouts } from '../../reducers/workoutreducer'
 import { notify } from '../../reducers/notificationreducer'
 import loginService from '../../services/login'
 import Notification from '../Notification/NotificationContainer'
@@ -23,7 +24,7 @@ class LoginFormContainer extends React.Component {
   loginHandler = async (event) => {
     event.preventDefault()
     const { username, password } = this.state
-    const { notifyConnect, loginConnect } = this.props
+    const { notifyConnect, loginConnect, initWorkoutsConnect } = this.props
 
     try {
       const user = await loginService.login({
@@ -33,6 +34,7 @@ class LoginFormContainer extends React.Component {
       window.localStorage.setItem('loggedInUser', JSON.stringify(user))
       this.setState({ username: '', password: '' })
       await loginConnect(user)
+      await initWorkoutsConnect(user)
     } catch (exception) {
       this.setState({ username: '', password: '' })
       notifyConnect('username and/or password incorrect', 'error', 5)
@@ -57,12 +59,14 @@ class LoginFormContainer extends React.Component {
 
 LoginFormContainer.propTypes = {
   loginConnect: PropTypes.func.isRequired,
-  notifyConnect: PropTypes.func.isRequired
+  notifyConnect: PropTypes.func.isRequired,
+  initWorkoutsConnect: PropTypes.func.isRequired
 }
 
 const mapDispatchToProps = {
   loginConnect: login,
-  notifyConnect: notify
+  notifyConnect: notify,
+  initWorkoutsConnect: initWorkouts
 }
 
 export default connect(

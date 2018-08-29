@@ -1,20 +1,18 @@
 import axios from 'axios'
 
-const baseUrl = '/api/workouts'
+const baseUrl = '/api/users'
 
 let userId = null
-let authHeader = null
+let headers = null
 
-const setUser = ({ user }) => {
+const setUser = (user) => {
   userId = user.id
-  authHeader = {
-    Authorization: `bearer ${user.token}`
-  }
+  headers = { headers: { Authorization: `bearer ${user.token}` } }
 }
 
-const getAll = async () => {
-  const response = await axios.post(`${baseUrl}/${userId}/workouts`, authHeader)
+const getUsersWorkouts = async () => {
+  const response = await axios.get(`${baseUrl}/${userId}/workouts`, headers)
   return response.data
 }
 
-export default { setUser, getAll }
+export default { getUsersWorkouts, setUser }

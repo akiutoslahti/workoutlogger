@@ -3,9 +3,7 @@ import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import Workout from './Workout'
 
-const WorkoutContainer = ({ workout }) => {
-  return <Workout workout={workout} />
-}
+const WorkoutContainer = ({ workout }) => <Workout workout={workout} />
 
 WorkoutContainer.propTypes = {}
 

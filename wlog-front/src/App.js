@@ -6,15 +6,18 @@ import { Container } from 'semantic-ui-react'
 import LoginForm from './components/LoginForm/LoginFormContainer'
 import NavigationBar from './components/NavigationBar/NavigationBarContainer'
 import Notification from './components/Notification/NotificationContainer'
+import WorkoutList from './components/WorkoutList/WorkoutListContainer'
 import { login } from './reducers/loginreducer'
+import { initWorkouts } from './reducers/workoutreducer'
 
 class App extends React.Component {
   componentDidMount = async () => {
-    const { loginConnect } = this.props
+    const { loginConnect, initWorkoutsConnect } = this.props
     const loggedUserJSON = window.localStorage.getItem('loggedInUser')
     if (loggedUserJSON) {
       const user = JSON.parse(loggedUserJSON)
       loginConnect(user)
+      initWorkoutsConnect(user)
     }
   }
 
@@ -33,7 +36,7 @@ class App extends React.Component {
             <div>
               <NavigationBar />
               <Notification />
-              <p>hello world!</p>
+              <WorkoutList />
             </div>
           )}
         </Router>
@@ -61,7 +64,8 @@ const mapStateToProps = (state) => ({
 })
 
 const mapDispatchToProps = {
-  loginConnect: login
+  loginConnect: login,
+  initWorkoutsConnect: initWorkouts
 }
 
 const ConnectedApp = connect(
